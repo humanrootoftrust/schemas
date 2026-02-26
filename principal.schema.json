@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://humanrootoftrust.org/schemas/v1/principal",
+  "title": "Principal",
+  "description": "A human who serves as the root of trust for one or more AI agents. The Principal is the ultimate authorizing entity — no agent acts without tracing back to a Principal's authorization. Public domain — Human Root of Trust framework.",
+  "type": "object",
+
+  "required": ["@context", "@type", "id", "displayName", "keyId", "createdAt"],
+
+  "properties": {
+    "@context": {
+      "oneOf": [
+        { "type": "string", "const": "https://humanrootoftrust.org/schemas/v1/principal" },
+        {
+          "type": "array",
+          "items": { "type": "string" },
+          "contains": { "const": "https://humanrootoftrust.org/schemas/v1/principal" }
+        }
+      ]
+    },
+
+    "@type": {
+      "type": "string",
+      "const": "Principal"
+    },
+
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for this principal. Typically email address.",
+      "format": "email",
+      "examples": ["eduardo@zerohumanco.ai"]
+    },
+
+    "displayName": {
+      "type": "string",
+      "description": "Human-readable name.",
+      "examples": ["Eduardo Vega"]
+    },
+
+    "keyId": {
+      "type": "string",
+      "description": "The hardware key ID associated with this principal's device. Binds the human identity to hardware.",
+      "examples": ["secure-enclave:mac-mini-m4:f3a9c201"]
+    },
+
+    "publicKey": {
+      "type": "string",
+      "description": "Base64-encoded P-256 public key. Used to verify all receipts signed on behalf of this principal.",
+      "pattern": "^[A-Za-z0-9+/=]+$"
+    },
+
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this principal record was created."
+    },
+
+    "agents": {
+      "type": "array",
+      "description": "IDs of agents authorized under this principal.",
+      "items": { "type": "string" },
+      "examples": [["zerohuman-runtime-v0.1"]]
+    },
+
+    "contactEmail": {
+      "type": "string",
+      "format": "email",
+      "description": "Contact address for notifications (may differ from id)."
+    },
+
+    "metadata": {
+      "type": "object",
+      "description": "Arbitrary key-value metadata.",
+      "additionalProperties": { "type": "string" }
+    }
+  },
+
+  "additionalProperties": true,
+
+  "$comment": "Public domain. Human Root of Trust framework — humanrootoftrust.org. No rights reserved."
+}

@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://humanrootoftrust.org/schemas/v1/authorization-chain",
+  "title": "AuthorizationChain",
+  "description": "An Agent Authorization Chain (AAC) — a verifiable record of how a human principal's intent flows through one or more agents to produce an action. Every link in the chain is traceable and cryptographically bound. Public domain — Human Root of Trust framework.",
+  "type": "object",
+
+  "required": ["@context", "@type", "id", "principalId", "terminalAction", "links", "createdAt"],
+
+  "properties": {
+    "@context": {
+      "oneOf": [
+        { "type": "string", "const": "https://humanrootoftrust.org/schemas/v1/authorization-chain" },
+        {
+          "type": "array",
+          "items": { "type": "string" },
+          "contains": { "const": "https://humanrootoftrust.org/schemas/v1/authorization-chain" }
+        }
+      ]
+    },
+
+    "@type": {
+      "type": "string",
+      "const": "AuthorizationChain"
+    },
+
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for this authorization chain.",
+      "examples": ["aac-20260222-a3f9d1"]
+    },
+
+    "principalId": {
+      "type": "string",
+      "description": "The Human Root of Trust who initiated this chain.",
+      "format": "email",
+      "examples": ["eduardo@zerohumanco.ai"]
+    },
+
+    "terminalAction": {
+      "type": "string",
+      "description": "The final real-world action this chain authorizes.",
+      "examples": ["send_weekly_report", "place_equity_trade"]
+    },
+
+    "links": {
+      "type": "array",
+      "description": "Ordered chain of authorization events from principal to final action. First link is always the human principal.",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["order", "type", "actorId", "authorization", "timestamp"],
+        "properties": {
+          "order": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Position in chain (0 = human principal, 1+ = agents)."
+          },
+          "type": {
+            "type": "string",
+            "enum": ["human-authorization", "agent-delegation", "agent-execution"],
+            "description": "Type of authorization event."
+          },
+          "actorId": {
+            "type": "string",
+            "description": "Who/what is authorizing at this link."
+          },
+          "authorization": {
+            "type": "string",
+            "description": "Human-readable description of what is being authorized.",
+            "examples": ["Authorize weekly report delivery every Sunday at 08:00"]
+          },
+          "scope": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Explicit list of action types this link authorizes.",
+            "examples": [["send_weekly_report"]]
+          },
+          "constraints": {
+            "type": "object",
+            "description": "Optional constraints on this authorization.",
+            "properties": {
+              "schedule": { "type": "string", "description": "Cron or natural language schedule." },
+              "maxPerDay": { "type": "integer" },
+              "maxPerWeek": { "type": "integer" },
+              "expiresAt": { "type": "string", "format": "date-time" },
+              "requiresApproval": { "type": "boolean" }
+            },
+            "additionalProperties": true
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When this link was established."
+          },
+          "receiptId": {
+            "type": "string",
+            "description": "If this link produced an action, the receipt ID that proves it."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+
+    "status": {
+      "type": "string",
+      "enum": ["active", "expired", "revoked", "completed"],
+      "description": "Current status of this authorization chain."
+    },
+
+    "policyId": {
+      "type": "string",
+      "description": "ID of the policy that governs this chain, if any."
+    }
+  },
+
+  "additionalProperties": true,
+
+  "$comment": "Public domain. Human Root of Trust framework — humanrootoftrust.org. No rights reserved."
+}

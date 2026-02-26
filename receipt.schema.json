@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://humanrootoftrust.org/schemas/v1/receipt",
+  "title": "AgentActionReceipt",
+  "description": "A cryptographic receipt proving that an autonomous agent took a specific action on behalf of a human principal. The foundational trust artifact of the Human Root of Trust framework. Every agent action must produce a receipt. Public domain.",
+  "type": "object",
+
+  "required": ["@context", "@type", "id", "agentId", "action", "principal", "timestamp", "payloadHash", "signingAlgorithm", "signature", "keyId"],
+
+  "properties": {
+    "@context": {
+      "oneOf": [
+        {
+          "type": "string",
+          "const": "https://humanrootoftrust.org/schemas/v1/receipt"
+        },
+        {
+          "type": "array",
+          "items": { "type": "string" },
+          "contains": { "const": "https://humanrootoftrust.org/schemas/v1/receipt" }
+        }
+      ]
+    },
+
+    "@type": {
+      "type": "string",
+      "const": "AgentActionReceipt"
+    },
+
+    "id": {
+      "type": "string",
+      "description": "Unique receipt identifier. Implementations should use a format that is sortable and embeds a timestamp.",
+      "examples": ["zh-send-report-20260222-a3f9d1"]
+    },
+
+    "agentId": {
+      "type": "string",
+      "description": "Identifier of the agent that took the action.",
+      "examples": ["zerohuman-runtime-v0.1"]
+    },
+
+    "action": {
+      "type": "string",
+      "description": "The action type that was executed. Snake_case convention.",
+      "examples": ["send_weekly_report", "place_equity_trade", "publish_content"]
+    },
+
+    "principal": {
+      "type": "string",
+      "description": "The human principal on whose behalf this action was taken.",
+      "format": "email",
+      "examples": ["eduardo@zerohumanco.ai"]
+    },
+
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this action was executed. ISO 8601 UTC."
+    },
+
+    "payloadHash": {
+      "type": "string",
+      "description": "Hash of the action payload. Format: {algorithm}:{hex}",
+      "pattern": "^[a-z0-9]+:[a-f0-9]+$",
+      "examples": ["sha256:a3f9d1c2e4b5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1"]
+    },
+
+    "signingAlgorithm": {
+      "type": "string",
+      "description": "The algorithm used to produce the signature. Implementations should support at minimum 'ecdsa-p256'. Hybrid post-quantum schemes are encouraged for long-lived receipts.",
+      "examples": ["ecdsa-p256", "hybrid:ecdsa-p256+ml-dsa-65"]
+    },
+
+    "signature": {
+      "type": "string",
+      "description": "Base64-encoded classical signature over the canonical signing payload.",
+      "pattern": "^[A-Za-z0-9+/=]+$"
+    },
+
+    "keyId": {
+      "type": "string",
+      "description": "Identifier of the signing key. Should be hardware-rooted where possible. Format is implementation-defined.",
+      "examples": ["secure-enclave:mac-mini-m4:f3a9c201"]
+    },
+
+    "signingPayload": {
+      "type": "string",
+      "description": "The canonical string that was signed. Implementations must define a deterministic serialization. Recommended format: {id}|{agentId}|{action}|{principal}|{unixTimestamp}|{payloadHash}",
+      "examples": ["zh-send-report-20260222-a3f9d1|zerohuman-runtime-v0.1|send_weekly_report|eduardo@zerohumanco.ai|1740211200|sha256:abc123..."]
+    },
+
+    "description": {
+      "type": "string",
+      "description": "Human-readable description of the action taken.",
+      "examples": ["Weekly status report composed and sent to eduardo@zerohumanco.ai"]
+    },
+
+    "authorizationChainId": {
+      "type": "string",
+      "description": "ID of the AuthorizationChain that authorized this action, if applicable."
+    }
+  },
+
+  "additionalProperties": true,
+
+  "$comment": "Public domain. Human Root of Trust framework — humanrootoftrust.org. No rights reserved."
+}
